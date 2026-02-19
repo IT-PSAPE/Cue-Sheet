@@ -18,13 +18,14 @@ interface UseTrackDragOptions {
 export function useTrackDrag({ selectedEvent, dispatch, eventId }: UseTrackDragOptions) {
   const [trackDragState, setTrackDragState] = useState<TrackDragState | null>(null)
 
-  const handleTrackDragStart = useCallback((trackId: string, index: number, e: React.MouseEvent) => {
+  const handleTrackDragStart = useCallback((trackId: string, index: number, e: React.PointerEvent) => {
     e.preventDefault()
+    ;(e.target as Element).setPointerCapture(e.pointerId)
     setTrackDragState({ trackId, startIndex: index, currentIndex: index, startY: e.clientY })
   }, [])
 
   const handleTrackDragMove = useCallback(
-    (e: MouseEvent) => {
+    (e: PointerEvent) => {
       if (!trackDragState || !selectedEvent) return
       const trackElements = document.querySelectorAll('[data-track-sidebar]')
       let newIndex = trackDragState.startIndex
@@ -53,11 +54,11 @@ export function useTrackDrag({ selectedEvent, dispatch, eventId }: UseTrackDragO
 
   useEffect(() => {
     if (trackDragState) {
-      window.addEventListener('mousemove', handleTrackDragMove)
-      window.addEventListener('mouseup', handleTrackDragEnd)
+      window.addEventListener('pointermove', handleTrackDragMove)
+      window.addEventListener('pointerup', handleTrackDragEnd)
       return () => {
-        window.removeEventListener('mousemove', handleTrackDragMove)
-        window.removeEventListener('mouseup', handleTrackDragEnd)
+        window.removeEventListener('pointermove', handleTrackDragMove)
+        window.removeEventListener('pointerup', handleTrackDragEnd)
       }
     }
   }, [trackDragState, handleTrackDragMove, handleTrackDragEnd])

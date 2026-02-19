@@ -26,11 +26,11 @@ interface TimelineContextValue {
   handlePlayPause: () => void
   handleStop: () => void
   isDraggingPlayhead: boolean
-  handlePlayheadMouseDown: (e: React.MouseEvent) => void
+  handlePlayheadPointerDown: (e: React.PointerEvent) => void
   justDraggedRef: RefObject<boolean>
-  startCueDrag: (e: React.MouseEvent, cue: CueItem, type: 'move' | 'resize-left' | 'resize-right') => void
+  startCueDrag: (e: React.PointerEvent, cue: CueItem, type: 'move' | 'resize-left' | 'resize-right') => void
   trackDragState: { trackId: string; startIndex: number; currentIndex: number; startY: number } | null
-  handleTrackDragStart: (trackId: string, index: number, e: React.MouseEvent) => void
+  handleTrackDragStart: (trackId: string, index: number, e: React.PointerEvent) => void
   handleTimelineScroll: () => void
   handleSidebarScroll: () => void
   onTrackClick: (trackId: string, startMinute: number) => void
@@ -95,7 +95,7 @@ export function TimelineProvider({ children, selectedEvent, onTrackClick, onCueC
     pixelsPerMinute: zoom.pixelsPerMinute, updateZoomAnchoredToPlayhead: zoom.updateZoomAnchoredToPlayhead,
     currentTimeMinutes: playback.currentTimeMinutes, setCurrentTimeMinutes: playback.setCurrentTimeMinutes,
     isPlaying: playback.isPlaying, handlePlayPause: playback.handlePlayPause, handleStop: playback.handleStop,
-    isDraggingPlayhead: playheadDrag.isDraggingPlayhead, handlePlayheadMouseDown: playheadDrag.handlePlayheadMouseDown,
+    isDraggingPlayhead: playheadDrag.isDraggingPlayhead, handlePlayheadPointerDown: playheadDrag.handlePlayheadPointerDown,
     justDraggedRef: cueDrag.justDraggedRef, startCueDrag: cueDrag.startCueDrag,
     trackDragState: trackDrag.trackDragState, handleTrackDragStart: trackDrag.handleTrackDragStart,
     handleTimelineScroll: scrollSync.handleTimelineScroll, handleSidebarScroll: scrollSync.handleSidebarScroll,
