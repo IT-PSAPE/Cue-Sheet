@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import type { Event } from '../types'
-import type { CueSheetState, CueSheetAction } from './cue-sheet-context'
+import type { CueSheetAction, CueSheetState } from './cue-sheet-reducer'
 
 export interface CueSheetContextValue {
   state: CueSheetState

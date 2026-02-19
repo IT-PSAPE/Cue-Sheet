@@ -1,4 +1,5 @@
 import type { SelectHTMLAttributes } from 'react'
+import { cn } from '../util/cn'
 
 interface SelectOption {
   value: string
@@ -13,6 +14,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export function Select({ label, error, id, options, className = '', ...props }: SelectProps) {
   const selectId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
+  const selectClassName = cn('px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white', error && 'border-red-500', className)
 
   return (
     <div className="flex flex-col gap-1">
@@ -21,11 +23,7 @@ export function Select({ label, error, id, options, className = '', ...props }: 
           {label}
         </label>
       )}
-      <select
-        id={selectId}
-        className={`px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white ${error ? 'border-red-500' : ''} ${className}`}
-        {...props}
-      >
+      <select id={selectId} className={selectClassName} {...props}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

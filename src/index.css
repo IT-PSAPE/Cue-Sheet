@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html,
+body {
+  overflow: hidden;
+}
+
 @layer utilities {
   .scroll-area {
     -ms-overflow-style: none;
