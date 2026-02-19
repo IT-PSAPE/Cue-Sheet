@@ -38,8 +38,8 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
     return null
   }, [selectedEvent, trackRowsRef])
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+  const handlePointerMove = useCallback(
+    (e: PointerEvent) => {
       if (!dragState || !selectedEvent) return
 
       const deltaX = e.clientX - dragState.startX
@@ -67,7 +67,7 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
     [dragState, selectedEvent, dispatch, totalMinutes, pixelsPerMinute, getTrackAtY]
   )
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
     if (cueDragResetTimeoutRef.current !== null) {
       window.clearTimeout(cueDragResetTimeoutRef.current)
       cueDragResetTimeoutRef.current = null
@@ -83,14 +83,14 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
 
   useEffect(() => {
     if (dragState) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
+      window.addEventListener('pointermove', handlePointerMove)
+      window.addEventListener('pointerup', handlePointerUp)
       return () => {
-        window.removeEventListener('mousemove', handleMouseMove)
-        window.removeEventListener('mouseup', handleMouseUp)
+        window.removeEventListener('pointermove', handlePointerMove)
+        window.removeEventListener('pointerup', handlePointerUp)
       }
     }
-  }, [dragState, handleMouseMove, handleMouseUp])
+  }, [dragState, handlePointerMove, handlePointerUp])
 
   useEffect(() => {
     return () => {
@@ -100,7 +100,7 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
     }
   }, [])
 
-  const startCueDrag = useCallback((e: React.MouseEvent, cue: CueItem, type: 'move' | 'resize-left' | 'resize-right') => {
+  const startCueDrag = useCallback((e: React.PointerEvent, cue: CueItem, type: 'move' | 'resize-left' | 'resize-right') => {
     e.stopPropagation()
     e.preventDefault()
     if (cueDragResetTimeoutRef.current !== null) {

@@ -55,16 +55,17 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
     [pixelsPerMinute, totalMinutes, timelineContainerRef, setCurrentTimeMinutes]
   )
 
-  const handlePlayheadMouseDown = useCallback((e: React.MouseEvent) => {
+  const handlePlayheadPointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    ;(e.target as Element).setPointerCapture(e.pointerId)
     playheadPointerClientXRef.current = e.clientX
     updatePlayheadFromPointer(e.clientX)
     setIsDraggingPlayhead(true)
   }, [updatePlayheadFromPointer])
 
   const handlePlayheadMove = useCallback(
-    (e: MouseEvent) => {
+    (e: PointerEvent) => {
       if (!isDraggingPlayhead) return
       playheadPointerClientXRef.current = e.clientX
     },
@@ -78,8 +79,8 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
 
   useEffect(() => {
     if (isDraggingPlayhead) {
-      window.addEventListener('mousemove', handlePlayheadMove)
-      window.addEventListener('mouseup', handlePlayheadUp)
+      window.addEventListener('pointermove', handlePlayheadMove)
+      window.addEventListener('pointerup', handlePlayheadUp)
 
       const updateFrame = () => {
         const clientX = playheadPointerClientXRef.current
@@ -92,8 +93,8 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
       playheadDragRafRef.current = requestAnimationFrame(updateFrame)
 
       return () => {
-        window.removeEventListener('mousemove', handlePlayheadMove)
-        window.removeEventListener('mouseup', handlePlayheadUp)
+        window.removeEventListener('pointermove', handlePlayheadMove)
+        window.removeEventListener('pointerup', handlePlayheadUp)
         if (playheadDragRafRef.current !== null) {
           cancelAnimationFrame(playheadDragRafRef.current)
           playheadDragRafRef.current = null
@@ -102,5 +103,5 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
     }
   }, [isDraggingPlayhead, handlePlayheadMove, handlePlayheadUp, updatePlayheadFromPointer])
 
-  return { isDraggingPlayhead, handlePlayheadMouseDown }
+  return { isDraggingPlayhead, handlePlayheadPointerDown }
 }

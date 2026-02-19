@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Icon } from '../../../components/icon'
 import { IconButton } from '../../../components/icon-button'
 import { useTimeline } from '../context/timeline-context'
+import { useFullscreen } from '../hooks/use-fullscreen'
 import { MIN_ZOOM } from '../utils/timeline-constants'
 
 interface TimelineOptionsMenuProps {
@@ -12,6 +13,7 @@ interface TimelineOptionsMenuProps {
 
 export function TimelineOptionsMenu({ onAddCue, onConfigureCueTypes, onCreateEvent }: TimelineOptionsMenuProps) {
   const { clampedZoom, maxZoom, updateZoomAnchoredToPlayhead } = useTimeline()
+  const { isFullscreen, toggleFullscreen } = useFullscreen()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -42,6 +44,10 @@ export function TimelineOptionsMenu({ onAddCue, onConfigureCueTypes, onCreateEve
           <Icon.plus size={14} className="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <IconButton size="lg" className="rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900" aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'} onClick={toggleFullscreen}>
+        {isFullscreen ? <Icon.minimize_01 size={16} className="w-4 h-4" /> : <Icon.maximize_01 size={16} className="w-4 h-4" />}
+      </IconButton>
 
       <div className="relative" ref={menuRef}>
         <IconButton size="lg" className="rounded-lg border border-gray-200 bg-white text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-900" aria-label="More options" onClick={() => setIsOpen((o) => !o)}>

@@ -74,7 +74,7 @@ export function TimelineSidebar() {
                 <div className="w-full h-0.5 bg-pink-500 shadow-sm" />
               </div>
             )}
-            <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 shrink-0" onMouseDown={(e) => handleTrackDragStart(track.id, index, e)}>
+            <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 shrink-0 touch-none" onPointerDown={(e) => handleTrackDragStart(track.id, index, e)}>
               <Icon.dots_grid size={16} className="w-4 h-4" />
             </div>
             <div className="flex items-center gap-2 min-w-0 flex-1">
