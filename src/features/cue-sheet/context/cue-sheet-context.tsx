@@ -1,8 +1,11 @@
-import { createContext, useReducer, type ReactNode } from 'react'
-import type { Event, EventFormData, CueItemFormData, TrackFormData } from '../types'
-import { createEvent, createCueItem, createTrack } from '../utils'
+import { useEffect, useReducer, type ReactNode } from 'react'
+import type { CueType, Event, EventFormData, CueItemFormData, TrackFormData } from '../types'
+import { createDefaultCueTypes, createEvent, createCueItem, createTrack } from '../utils'
+import { CueSheetContext, type CueSheetContextValue } from './cue-sheet-context-store'
 
-type CueSheetAction =
+const STORAGE_KEY = 'cue-sheet-data'
+
+export type CueSheetAction =
   | { type: 'CREATE_EVENT'; payload: EventFormData }
   | { type: 'UPDATE_EVENT'; payload: { id: string; data: Partial<EventFormData> } }
   | { type: 'DELETE_EVENT'; payload: { id: string } }
@@ -15,15 +18,56 @@ type CueSheetAction =
   | { type: 'UPDATE_CUE_ITEM'; payload: { eventId: string; cueItemId: string; data: Partial<CueItemFormData> } }
   | { type: 'DELETE_CUE_ITEM'; payload: { eventId: string; cueItemId: string } }
   | { type: 'MOVE_CUE_ITEM'; payload: { eventId: string; cueItemId: string; startMinute: number; trackId?: string } }
+  | { type: 'SET_CUE_TYPES'; payload: CueType[] }
 
-interface CueSheetState {
+export interface CueSheetState {
   events: Event[]
   selectedEventId: string | null
+  cueTypes: CueType[]
 }
 
 const initialState: CueSheetState = {
   events: [],
   selectedEventId: null,
+  cueTypes: createDefaultCueTypes(),
+}
+
+function loadState(): CueSheetState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return initialState
+    const parsed = JSON.parse(raw) as CueSheetState
+    const cueTypes = Array.isArray(parsed.cueTypes) && parsed.cueTypes.length > 0
+      ? parsed.cueTypes
+      : createDefaultCueTypes()
+    const validTypeIds = new Set(cueTypes.map((type) => type.id))
+    const fallbackTypeId = cueTypes[0]?.id ?? createDefaultCueTypes()[0].id
+
+    const events = (parsed.events ?? []).map((event) => ({
+      ...event,
+      createdAt: new Date(event.createdAt),
+      cueItems: (event.cueItems ?? []).map((item) => ({
+        ...item,
+        type: validTypeIds.has(item.type) ? item.type : fallbackTypeId,
+      })),
+    }))
+
+    return {
+      events,
+      selectedEventId: parsed.selectedEventId ?? events[0]?.id ?? null,
+      cueTypes,
+    }
+  } catch {
+    return initialState
+  }
+}
+
+function saveState(state: CueSheetState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // Storage full or unavailable — silently ignore
+  }
 }
 
 function cueSheetReducer(state: CueSheetState, action: CueSheetAction): CueSheetState {
@@ -170,25 +214,38 @@ function cueSheetReducer(state: CueSheetState, action: CueSheetAction): CueSheet
         }),
       }
     }
+    case 'SET_CUE_TYPES': {
+      const cueTypes = action.payload.length > 0 ? action.payload : createDefaultCueTypes()
+      const validTypeIds = new Set(cueTypes.map((type) => type.id))
+      const fallbackTypeId = cueTypes[0].id
+
+      return {
+        ...state,
+        cueTypes,
+        events: state.events.map((event) => ({
+          ...event,
+          cueItems: event.cueItems.map((cueItem) => ({
+            ...cueItem,
+            type: validTypeIds.has(cueItem.type) ? cueItem.type : fallbackTypeId,
+          })),
+        })),
+      }
+    }
     default:
       return state
   }
 }
-
-export interface CueSheetContextValue {
-  state: CueSheetState
-  dispatch: React.Dispatch<CueSheetAction>
-  selectedEvent: Event | null
-}
-
-export const CueSheetContext = createContext<CueSheetContextValue | null>(null)
 
 interface CueSheetProviderProps {
   children: ReactNode
 }
 
 export function CueSheetProvider({ children }: CueSheetProviderProps) {
-  const [state, dispatch] = useReducer(cueSheetReducer, initialState)
+  const [state, dispatch] = useReducer(cueSheetReducer, undefined, loadState)
+
+  useEffect(() => {
+    saveState(state)
+  }, [state])
 
   const selectedEvent = state.events.find((e) => e.id === state.selectedEventId) ?? null
 

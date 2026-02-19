@@ -23,7 +23,7 @@ export function Select({ label, error, id, options, className = '', ...props }: 
       )}
       <select
         id={selectId}
-        className={`px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white ${error ? 'border-red-500' : ''} ${className}`}
+        className={`px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white ${error ? 'border-red-500' : ''} ${className}`}
         {...props}
       >
         {options.map((option) => (

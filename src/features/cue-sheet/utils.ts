@@ -1,19 +1,42 @@
-import type { Event, EventFormData, CueItem, CueItemFormData, Track, TrackFormData } from './types'
+import type {
+  CueType,
+  Event,
+  EventFormData,
+  CueItem,
+  CueItemFormData,
+  Track,
+  TrackFormData,
+} from './types'
 
 export function generateId(): string {
   return crypto.randomUUID()
 }
 
-export const DEFAULT_TRACK_COLORS = [
-  '#3b82f6', // blue
-  '#10b981', // emerald
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#8b5cf6', // violet
+export const TRACK_COLORS = [
   '#ec4899', // pink
-  '#06b6d4', // cyan
+  '#f43f5e', // rose
+  '#f97316', // orange
+  '#f59e0b', // amber
+  '#eab308', // yellow
   '#84cc16', // lime
+  '#10b981', // emerald
+  '#14b8a6', // teal
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#8b5cf6', // violet
+  '#a855f7', // purple
 ]
+
+export const DEFAULT_CUE_TYPES: CueType[] = [
+  { id: 'performance', name: 'Performance', icon: 'music' },
+  { id: 'technical', name: 'Technical', icon: 'wrench' },
+  { id: 'equipment', name: 'Equipment', icon: 'briefcase' },
+  { id: 'announcement', name: 'Announcement', icon: 'microphone' },
+  { id: 'transition', name: 'Transition', icon: 'transition' },
+]
+
+/** @deprecated Use TRACK_COLORS instead */
+export const DEFAULT_TRACK_COLORS = TRACK_COLORS
 
 export function createTrack(data: TrackFormData): Track {
   return {
@@ -26,9 +49,11 @@ export function createTrack(data: TrackFormData): Track {
 export function createDefaultTracks(): Track[] {
   return [
     { id: generateId(), name: 'Main Stage', color: DEFAULT_TRACK_COLORS[0] },
-    { id: generateId(), name: 'Audio', color: DEFAULT_TRACK_COLORS[1] },
-    { id: generateId(), name: 'Lighting', color: DEFAULT_TRACK_COLORS[2] },
   ]
+}
+
+export function createDefaultCueTypes(): CueType[] {
+  return DEFAULT_CUE_TYPES.map((type) => ({ ...type }))
 }
 
 export function createEvent(data: EventFormData): Event {
@@ -48,7 +73,6 @@ export function createCueItem(data: CueItemFormData): CueItem {
   return {
     id: generateId(),
     title: data.title,
-    description: data.description,
     type: data.type,
     trackId: data.trackId,
     startMinute: data.startMinute,

@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .scroll-area {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scroll-area::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}

@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { CueSheetContext, type CueSheetContextValue } from '../context/cue-sheet-context'
+import { CueSheetContext, type CueSheetContextValue } from '../context/cue-sheet-context-store'
 
 export function useCueSheet(): CueSheetContextValue {
   const context = useContext(CueSheetContext)

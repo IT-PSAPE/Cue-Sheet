@@ -1,4 +1,37 @@
-export type CueItemType = 'performance' | 'technical' | 'equipment' | 'announcement' | 'transition'
+export type CueItemType = string
+
+export type CueTypeIcon =
+  | 'music'
+  | 'wrench'
+  | 'briefcase'
+  | 'microphone'
+  | 'transition'
+  | 'star'
+  | 'flag'
+  | 'bolt'
+  | 'bell'
+  | 'users'
+  | 'camera'
+  | 'video'
+  | 'lightbulb'
+  | 'clock'
+  | 'calendar'
+  | 'clipboard'
+  | 'pin'
+  | 'speaker'
+  | 'shield'
+  | 'check-circle'
+  | 'alert'
+  | 'heart'
+  | 'book'
+  | 'truck'
+  | 'sparkles'
+
+export interface CueType {
+  id: string
+  name: string
+  icon: CueTypeIcon
+}
 
 export interface Track {
   id: string
@@ -9,7 +42,6 @@ export interface Track {
 export interface CueItem {
   id: string
   title: string
-  description: string
   type: CueItemType
   trackId: string
   startMinute: number
@@ -35,7 +67,6 @@ export interface EventFormData {
 
 export interface CueItemFormData {
   title: string
-  description: string
   type: CueItemType
   trackId: string
   startMinute: number
