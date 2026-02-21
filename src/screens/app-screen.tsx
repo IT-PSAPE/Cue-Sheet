@@ -1,9 +1,11 @@
-import { Button } from '../components/button'
-import { EmptyState } from '../components/empty-state'
-import { CueSheetTopBar } from '../features/cue-sheet/components/cue-sheet-top-bar'
-import { EventDialogs } from '../features/cue-sheet/components/event-dialogs'
-import { TimelineView } from '../features/cue-sheet/components/timeline-view'
-import { useAppContext } from '../features/cue-sheet/context/app-context'
+import { Button } from '@/components/button'
+import { EmptyState } from '@/components/empty-state'
+import { CueSheetTopBar } from '@/features/app-shell/cue-sheet-top-bar'
+import { DeleteEventDialog } from '@/features/events/dialogs/delete-event-dialog'
+import { EditEventDialog } from '@/features/events/dialogs/edit-event-dialog'
+import { NewEventDialog } from '@/features/events/dialogs/new-event-dialog'
+import { TimelineView } from '@/features/timeline/timeline-view'
+import { useAppContext } from '@/contexts/app-context'
 
 function AppScreenContent() {
   const { hasSelectedEvent, openCreateEvent } = useAppContext()
@@ -21,8 +23,9 @@ function AppScreenContent() {
           action={<Button onClick={openCreateEvent}>+ Create First Event</Button>}
         />
       </main>
-
-      <EventDialogs />
+      <NewEventDialog />
+      <EditEventDialog />
+      <DeleteEventDialog />
     </div>
   )
 }

@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "exportedAt": "2026-02-21T08:18:09.187Z",
+  "cueTypes": [
+    {
+      "id": "performance",
+      "name": "Performance",
+      "icon": "music"
+    },
+    {
+      "id": "technical",
+      "name": "Technical",
+      "icon": "wrench"
+    },
+    {
+      "id": "equipment",
+      "name": "Equipment",
+      "icon": "briefcase"
+    },
+    {
+      "id": "announcement",
+      "name": "Announcement",
+      "icon": "microphone"
+    },
+    {
+      "id": "transition",
+      "name": "Transition",
+      "icon": "transition"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-pe-worship-service-15-feb-scj43-service",
+      "name": "PE WORSHIP SERVICE (15 FEB SCJ43) - SERVICE",
+      "description": "Service-only import from provided worship-service schedule screenshot.",
+      "totalDurationMinutes": 151,
+      "tracks": [
+        {
+          "id": "track-1",
+          "name": "MoT Ushers",
+          "color": "#ec4899",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-2",
+          "name": "MoC",
+          "color": "#f43f5e",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-3",
+          "name": "Praise leader",
+          "color": "#f97316",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-4",
+          "name": "Exam Invigilator",
+          "color": "#f59e0b",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-5",
+          "name": "Presider",
+          "color": "#eab308",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-6",
+          "name": "Prayer leader",
+          "color": "#84cc16",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-7",
+          "name": "Presider/Choir",
+          "color": "#10b981",
+          "hidden": false,
+          "locked": false
+        },
+        {
+          "id": "track-8",
+          "name": "RGSN",
+          "color": "#14b8a6",
+          "hidden": false,
+          "locked": false
+        }
+      ],
+      "cueItems": [
+        {
+          "id": "cue-1",
+          "title": "Members get seated",
+          "type": "performance",
+          "trackId": "track-1",
+          "startMinute": 0,
+          "durationMinutes": 5,
+          "notes": "Section: Service | Time: 11:30-11:35 | Who: MoT Ushers"
+        },
+        {
+          "id": "cue-2",
+          "title": "Exam video",
+          "type": "performance",
+          "trackId": "track-2",
+          "startMinute": 5,
+          "durationMinutes": 10,
+          "notes": "Section: Service | Time: 11:35-11:45 | Who: MoC"
+        },
+        {
+          "id": "cue-3",
+          "title": "Worship",
+          "type": "performance",
+          "trackId": "track-3",
+          "startMinute": 15,
+          "durationMinutes": 15,
+          "notes": "Section: Service | Time: 11:45-12:00 | Who: Praise leader"
+        },
+        {
+          "id": "cue-4",
+          "title": "Introduction to exam and Exam taking",
+          "type": "performance",
+          "trackId": "track-4",
+          "startMinute": 30,
+          "durationMinutes": 20,
+          "notes": "Section: Service | Time: 12:00-12:20 | Who: Exam Invigilator"
+        },
+        {
+          "id": "cue-5",
+          "title": "Introduction of service and silent prayer",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 50,
+          "durationMinutes": 5,
+          "notes": "Section: Service | Time: 12:20-12:25 | Who: Presider"
+        },
+        {
+          "id": "cue-6",
+          "title": "Hymn of glory",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 55,
+          "durationMinutes": 3,
+          "notes": "Section: Service | Time: 12:25-12:28 | Who: Presider"
+        },
+        {
+          "id": "cue-7",
+          "title": "Representative prayer",
+          "type": "performance",
+          "trackId": "track-6",
+          "startMinute": 58,
+          "durationMinutes": 5,
+          "notes": "Section: Service | Time: 12:28-12:33 | Who: Prayer leader"
+        },
+        {
+          "id": "cue-8",
+          "title": "Call to worship",
+          "type": "performance",
+          "trackId": "track-7",
+          "startMinute": 63,
+          "durationMinutes": 5,
+          "notes": "Section: Service | Time: 12:33-12:38 | Who: Presider/Choir"
+        },
+        {
+          "id": "cue-9",
+          "title": "Introduction to sermon",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 68,
+          "durationMinutes": 2,
+          "notes": "Section: Service | Time: 12:38-12:40 | Who: Presider"
+        },
+        {
+          "id": "cue-10",
+          "title": "Sermon and Closing prayer",
+          "type": "performance",
+          "trackId": "track-8",
+          "startMinute": 70,
+          "durationMinutes": 60,
+          "notes": "Section: Service | Time: 12:40-13:40 | Who: RGSN"
+        },
+        {
+          "id": "cue-11",
+          "title": "Hymn of thanksgiving",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 130,
+          "durationMinutes": 3,
+          "notes": "Section: Service | Time: 13:40-13:43 | Who: Presider"
+        },
+        {
+          "id": "cue-12",
+          "title": "Announcements",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 133,
+          "durationMinutes": 10,
+          "notes": "Section: Service | Time: 13:43-13:53 | Who: Presider"
+        },
+        {
+          "id": "cue-13",
+          "title": "Shincheonji victory chant",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 143,
+          "durationMinutes": 2,
+          "notes": "Section: Service | Time: 13:53-13:55 | Who: Presider"
+        },
+        {
+          "id": "cue-14",
+          "title": "Lord's prayer",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 145,
+          "durationMinutes": 2,
+          "notes": "Section: Service | Time: 13:55-13:57 | Who: Presider"
+        },
+        {
+          "id": "cue-15",
+          "title": "Return glory",
+          "type": "performance",
+          "trackId": "track-8",
+          "startMinute": 147,
+          "durationMinutes": 2,
+          "notes": "Section: Service | Time: 13:57-13:59 | Who: RGSN"
+        },
+        {
+          "id": "cue-16",
+          "title": "Shincheonji anthem",
+          "type": "performance",
+          "trackId": "track-5",
+          "startMinute": 149,
+          "durationMinutes": 2,
+          "notes": "Section: Service | Time: 13:59-14:01 | Who: Presider"
+        }
+      ],
+      "createdAt": "2026-02-21T08:18:09.187Z"
+    }
+  ]
+}
