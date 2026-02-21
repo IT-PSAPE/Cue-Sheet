@@ -1,30 +1,48 @@
-import { Modal } from '../../../components/modal'
+import { useCallback, useEffect } from 'react'
+import { Dialog } from '../../../components/dialog'
+import { Icon } from '../../../components/icon'
+import { useAppContext } from '../context/app-context'
+import { isTrackLocked } from '../utils'
 import { CueItemForm } from './cue-item-form'
-import type { CueItem, CueItemFormData, CueType, Track } from '../types'
 
-interface EditCueModalProps {
-  cue: CueItem | null
-  onClose: () => void
-  tracks: Track[]
-  cueTypes: CueType[]
-  onSubmit: (data: CueItemFormData) => void
-  onDelete: () => void
-}
+export function EditCueModal() {
+  const { selectedEvent, cueTypes, editingCue, closeEditCue, handleUpdateCue, openDeleteCue } = useAppContext()
+  const isEditingCueLocked = Boolean(selectedEvent && editingCue && isTrackLocked(selectedEvent.tracks, editingCue.trackId))
+  const handleDialogOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) closeEditCue()
+    },
+    [closeEditCue]
+  )
 
-export function EditCueModal({ cue, onClose, tracks, cueTypes, onSubmit, onDelete }: EditCueModalProps) {
+  useEffect(() => {
+    if (isEditingCueLocked) closeEditCue()
+  }, [closeEditCue, isEditingCueLocked])
+
+  if (!selectedEvent || !editingCue || isEditingCueLocked) return null
+
   return (
-    <Modal isOpen={!!cue} onClose={onClose} title="Edit Cue" size="sm" compact>
-      {cue && (
-        <CueItemForm
-          initialData={{ title: cue.title, type: cue.type, trackId: cue.trackId, startMinute: cue.startMinute, durationMinutes: cue.durationMinutes, notes: cue.notes }}
-          tracks={tracks}
-          cueTypes={cueTypes}
-          defaultTrackId={cue.trackId}
-          onSubmit={onSubmit}
-          onCancel={onClose}
-          onDelete={onDelete}
-        />
-      )}
-    </Modal>
+    <Dialog.Root open={Boolean(editingCue)} onOpenChange={handleDialogOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport size="sm">
+          <Dialog.Header>
+            <h2 className="text-lg font-semibold text-gray-900">Edit Cue</h2>
+            <Dialog.Close><Icon.x_close size={20} /></Dialog.Close>
+          </Dialog.Header>
+          <Dialog.Content>
+            <CueItemForm
+              initialData={{ title: editingCue.title, type: editingCue.type, trackId: editingCue.trackId, startMinute: editingCue.startMinute, durationMinutes: editingCue.durationMinutes, notes: editingCue.notes }}
+              tracks={selectedEvent.tracks}
+              cueTypes={cueTypes}
+              defaultTrackId={editingCue.trackId}
+              onSubmit={handleUpdateCue}
+              onCancel={closeEditCue}
+              onDelete={openDeleteCue}
+            />
+          </Dialog.Content>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }

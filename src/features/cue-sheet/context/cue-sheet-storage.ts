@@ -17,6 +17,11 @@ export function loadCueSheetState(initialState: CueSheetState): CueSheetState {
     const events = (parsedState.events ?? []).map((event) => ({
       ...event,
       createdAt: new Date(event.createdAt),
+      tracks: (event.tracks ?? []).map((track) => ({
+        ...track,
+        hidden: Boolean(track.hidden),
+        locked: Boolean(track.locked),
+      })),
       cueItems: (event.cueItems ?? []).map((cueItem) => ({
         ...cueItem,
         type: validTypeIds.has(cueItem.type) ? cueItem.type : fallbackTypeId,

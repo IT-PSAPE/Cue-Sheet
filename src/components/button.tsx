@@ -15,11 +15,11 @@ const buttonStyles = cv({
   ],
   variants: {
     variant: {
-      primary: ['bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500'],
-      secondary: ['bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500'],
-      danger: ['bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'],
-      'danger-secondary': ['border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 focus:ring-red-500'],
-      ghost: ['bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500'],
+      primary: ['bg-pink-600 text-white hover:bg-pink-700 focus:ring-foreground-brand-primary/40'],
+      secondary: ['bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-foreground-brand-primary/40'],
+      danger: ['bg-red-600 text-white hover:bg-red-700 focus:ring-foreground-brand-primary/40'],
+      'danger-secondary': ['border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 focus:ring-foreground-brand-primary/40'],
+      ghost: ['bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-foreground-brand-primary/40'],
     },
     size: {
       sm: ['px-2.5 py-1.5 text-sm'],

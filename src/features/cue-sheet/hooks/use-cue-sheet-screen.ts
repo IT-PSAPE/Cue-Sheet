@@ -1,33 +1,50 @@
 import { useCallback, useState } from 'react'
-import type { EventFormData } from '../types'
+import type { CueItemFormData, CueType, EventFormData } from '../types'
 import { useCueSheet } from './use-cue-sheet'
+import { useCueDialogState, type AddCueDefaults } from './use-cue-dialog-state'
 
 type EventDialog = 'create' | 'edit' | 'delete' | null
 
 interface UseCueSheetScreenValue {
   state: ReturnType<typeof useCueSheet>['state']
   selectedEvent: ReturnType<typeof useCueSheet>['selectedEvent']
-  optionsContainer: HTMLDivElement | null
-  setOptionsContainer: (element: HTMLDivElement | null) => void
+  cueTypes: CueType[]
   isCreatingEvent: boolean
   isEditingEvent: boolean
   isDeletingEvent: boolean
+  isAddingCue: boolean
+  isDeletingCue: boolean
+  isConfiguringCueTypes: boolean
+  addCueDefaults: AddCueDefaults | null
+  editingCue: ReturnType<typeof useCueDialogState>['editingCue']
   openCreateEvent: () => void
   openEditEvent: () => void
   openDeleteEvent: () => void
+  openAddCue: (defaults?: AddCueDefaults) => void
+  openEditCue: (cueId: string) => void
+  openDeleteCue: () => void
+  openConfigureCueTypes: () => void
   closeCreateEvent: () => void
   closeEditEvent: () => void
   closeDeleteEvent: () => void
+  closeAddCue: () => void
+  closeEditCue: () => void
+  closeDeleteCue: () => void
+  closeConfigureCueTypes: () => void
   handleSelectEvent: (id: string) => void
   handleCreateEvent: (data: EventFormData) => void
   handleUpdateEvent: (data: EventFormData) => void
   handleDeleteEvent: () => void
+  handleAddCue: (data: CueItemFormData) => void
+  handleUpdateCue: (data: CueItemFormData) => void
+  handleDeleteCue: () => void
+  handleSaveCueTypes: (types: CueType[]) => void
 }
 
 export function useCueSheetScreen(): UseCueSheetScreenValue {
   const { state, dispatch, selectedEvent } = useCueSheet()
   const [activeDialog, setActiveDialog] = useState<EventDialog>(null)
-  const [optionsContainer, setOptionsContainer] = useState<HTMLDivElement | null>(null)
+  const { resetCueDialogs, ...cueDialogs } = useCueDialogState({ selectedEvent, dispatch })
 
   const openCreateEvent = useCallback(() => {
     setActiveDialog('create')
@@ -55,9 +72,10 @@ export function useCueSheetScreen(): UseCueSheetScreenValue {
 
   const handleSelectEvent = useCallback(
     (id: string) => {
+      resetCueDialogs()
       dispatch({ type: 'SELECT_EVENT', payload: { id } })
     },
-    [dispatch]
+    [dispatch, resetCueDialogs]
   )
 
   const handleCreateEvent = useCallback(
@@ -79,15 +97,15 @@ export function useCueSheetScreen(): UseCueSheetScreenValue {
 
   const handleDeleteEvent = useCallback(() => {
     if (!selectedEvent) return
+    resetCueDialogs()
     dispatch({ type: 'DELETE_EVENT', payload: { id: selectedEvent.id } })
     closeDeleteEvent()
-  }, [closeDeleteEvent, dispatch, selectedEvent])
+  }, [closeDeleteEvent, dispatch, resetCueDialogs, selectedEvent])
 
   return {
     state,
     selectedEvent,
-    optionsContainer,
-    setOptionsContainer,
+    cueTypes: state.cueTypes,
     isCreatingEvent: activeDialog === 'create',
     isEditingEvent: activeDialog === 'edit',
     isDeletingEvent: activeDialog === 'delete',
@@ -101,5 +119,6 @@ export function useCueSheetScreen(): UseCueSheetScreenValue {
     handleCreateEvent,
     handleUpdateEvent,
     handleDeleteEvent,
+    ...cueDialogs,
   }
 }

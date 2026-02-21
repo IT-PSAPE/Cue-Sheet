@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CueItem, Event } from '../types'
 import type { CueSheetAction } from '../context/cue-sheet-reducer'
 import { CUE_DRAG_CLICK_SUPPRESS_MS } from '../utils/timeline-constants'
+import { isTrackLocked } from '../utils'
 
 interface CueDragState {
   cueId: string
@@ -19,9 +20,10 @@ interface UseCueDragOptions {
   totalMinutes: number
   pixelsPerMinute: number
   trackRowsRef: React.RefObject<HTMLDivElement | null>
+  disableTouchInteractions: boolean
 }
 
-export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMinute, trackRowsRef }: UseCueDragOptions) {
+export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMinute, trackRowsRef, disableTouchInteractions }: UseCueDragOptions) {
   const [dragState, setDragState] = useState<CueDragState | null>(null)
   const justDraggedRef = useRef(false)
   const cueDragResetTimeoutRef = useRef<number | null>(null)
@@ -32,7 +34,10 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
     for (const row of trackRows) {
       const rect = row.getBoundingClientRect()
       if (clientY >= rect.top && clientY <= rect.bottom) {
-        return row.getAttribute('data-track-id')
+        const trackId = row.getAttribute('data-track-id')
+        if (!trackId) continue
+        if (isTrackLocked(selectedEvent.tracks, trackId)) continue
+        return trackId
       }
     }
     return null
@@ -93,6 +98,11 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
   }, [dragState, handlePointerMove, handlePointerUp])
 
   useEffect(() => {
+    if (!disableTouchInteractions) return
+    setDragState(null)
+  }, [disableTouchInteractions])
+
+  useEffect(() => {
     return () => {
       if (cueDragResetTimeoutRef.current !== null) {
         window.clearTimeout(cueDragResetTimeoutRef.current)
@@ -101,6 +111,9 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
   }, [])
 
   const startCueDrag = useCallback((e: React.PointerEvent, cue: CueItem, type: 'move' | 'resize-left' | 'resize-right') => {
+    if (disableTouchInteractions && e.pointerType === 'touch') return
+    if (!selectedEvent) return
+    if (isTrackLocked(selectedEvent.tracks, cue.trackId)) return
     e.stopPropagation()
     e.preventDefault()
     if (cueDragResetTimeoutRef.current !== null) {
@@ -117,7 +130,7 @@ export function useCueDrag({ selectedEvent, dispatch, totalMinutes, pixelsPerMin
       startDuration: cue.durationMinutes,
       startTrackId: cue.trackId,
     })
-  }, [])
+  }, [disableTouchInteractions, selectedEvent])
 
   return { dragState, justDraggedRef, startCueDrag }
 }

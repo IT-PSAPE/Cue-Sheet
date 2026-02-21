@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { PLAYHEAD_DRAG_EDGE_THRESHOLD_RATIO, PLAYHEAD_DRAG_MIN_EDGE_THRESHOLD_PX } from '../utils/timeline-constants'
+import { PLAYHEAD_DRAG_EDGE_THRESHOLD_RATIO, PLAYHEAD_DRAG_MIN_EDGE_THRESHOLD_PX, TIMELINE_HORIZONTAL_PADDING } from '../utils/timeline-constants'
 
 interface UsePlayheadDragOptions {
   pixelsPerMinute: number
@@ -7,9 +7,10 @@ interface UsePlayheadDragOptions {
   timelineContainerRef: React.RefObject<HTMLDivElement | null>
   setCurrentTimeMinutes: React.Dispatch<React.SetStateAction<number>>
   isDraggingPlayheadRef: React.RefObject<boolean>
+  disableTouchInteractions: boolean
 }
 
-export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContainerRef, setCurrentTimeMinutes, isDraggingPlayheadRef }: UsePlayheadDragOptions) {
+export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContainerRef, setCurrentTimeMinutes, isDraggingPlayheadRef, disableTouchInteractions }: UsePlayheadDragOptions) {
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false)
   isDraggingPlayheadRef.current = isDraggingPlayhead
   const playheadPointerClientXRef = useRef<number | null>(null)
@@ -48,7 +49,7 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
       const maxViewportX = nextScrollLeft < maxScrollLeft ? viewportWidth - edgeThreshold : viewportWidth
       const pointerViewportX = Math.min(maxViewportX, Math.max(minViewportX, pointerViewportXRaw))
       const timelineX = nextScrollLeft + pointerViewportX
-      const newTime = Math.max(0, Math.min(totalMinutes, timelineX / pixelsPerMinute))
+      const newTime = Math.max(0, Math.min(totalMinutes, (timelineX - TIMELINE_HORIZONTAL_PADDING) / pixelsPerMinute))
 
       setCurrentTimeMinutes((prevTime) => (Math.abs(prevTime - newTime) < 0.0001 ? prevTime : newTime))
     },
@@ -56,13 +57,14 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
   )
 
   const handlePlayheadPointerDown = useCallback((e: React.PointerEvent) => {
+    if (disableTouchInteractions && e.pointerType === 'touch') return
     e.preventDefault()
     e.stopPropagation()
     ;(e.target as Element).setPointerCapture(e.pointerId)
     playheadPointerClientXRef.current = e.clientX
     updatePlayheadFromPointer(e.clientX)
     setIsDraggingPlayhead(true)
-  }, [updatePlayheadFromPointer])
+  }, [disableTouchInteractions, updatePlayheadFromPointer])
 
   const handlePlayheadMove = useCallback(
     (e: PointerEvent) => {
@@ -76,6 +78,12 @@ export function usePlayheadDrag({ pixelsPerMinute, totalMinutes, timelineContain
     setIsDraggingPlayhead(false)
     playheadPointerClientXRef.current = null
   }, [])
+
+  useEffect(() => {
+    if (!disableTouchInteractions) return
+    setIsDraggingPlayhead(false)
+    playheadPointerClientXRef.current = null
+  }, [disableTouchInteractions])
 
   useEffect(() => {
     if (isDraggingPlayhead) {

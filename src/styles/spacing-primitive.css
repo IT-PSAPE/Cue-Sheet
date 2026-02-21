@@ -1,0 +1,12 @@
+:root {
+  --margin: clamp(0.75rem, -3.3125rem + 13vw, 4rem);
+}
+
+@theme {
+  --spacing-margin: clamp(0.75rem, -3.3125rem + 13vw, 4rem);
+  --spacing-container: 80rem;
+  --spacing-container-sm: 45rem;
+  --spacing-navbar: 2.5rem;
+}
+
+@custom-variant mobile (@media (max-width: 480px));

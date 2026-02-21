@@ -1,6 +1,6 @@
 export const MIN_ZOOM = 1
 export const MAX_EFFECTIVE_ZOOM = 8
-export const ZOOM_STEP = 0.25
+export const ZOOM_FACTOR = 1.1
 export const BASE_PIXELS_PER_MINUTE = 8
 export const TRACK_HEIGHT = 56
 export const TIME_RULER_HEIGHT = 36
@@ -8,8 +8,7 @@ export const SIDEBAR_WIDTH = 180
 export const PLAYBACK_TICK_MS = 50
 export const PLAYBACK_SPEED_MULTIPLIER = 1
 export const PLAYHEAD_FOLLOW_THRESHOLD_RATIO = 0.75
-export const PLAYHEAD_FOLLOW_TARGET_RATIO = 0.6
-export const FOLLOW_SCROLL_MIN_DELTA_PX = 2
 export const PLAYHEAD_DRAG_EDGE_THRESHOLD_RATIO = 0.06
 export const PLAYHEAD_DRAG_MIN_EDGE_THRESHOLD_PX = 14.4
 export const CUE_DRAG_CLICK_SUPPRESS_MS = 120
+export const TIMELINE_HORIZONTAL_PADDING = 20

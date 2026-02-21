@@ -6,6 +6,7 @@ import { Input } from '../../../components/input'
 import { Textarea } from '../../../components/textarea'
 import { getCueTypeIcon } from '../cue-type-icons'
 import type { CueItemFormData, CueItemType, CueType, Track } from '../types'
+import { isTrackLocked } from '../utils'
 
 interface CueItemFormProps {
   initialData?: Partial<CueItemFormData>
@@ -38,8 +39,9 @@ export function CueItemForm({
   const [startMinute, setStartMinute] = useState(initialData?.startMinute ?? defaultStartMinute)
   const [durationMinutes, setDurationMinutes] = useState(initialData?.durationMinutes ?? 5)
   const [notes, setNotes] = useState(initialData?.notes ?? '')
+  const isSelectedTrackLocked = isTrackLocked(tracks, trackId)
 
-  const trackOptions = tracks.map((t) => ({ value: t.id, label: t.name }))
+  const trackOptions = tracks.map((track) => ({ value: track.id, label: track.locked ? `${track.name} (Locked)` : track.name, disabled: Boolean(track.locked) }))
   const typeOptions = cueTypes.map((cueType) => ({
     value: cueType.id,
     label: cueType.name,
@@ -49,6 +51,7 @@ export function CueItemForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) return
+    if (isSelectedTrackLocked) return
     onSubmit({
       title: title.trim(),
       type,
@@ -69,7 +72,7 @@ export function CueItemForm({
         onChange={(e) => setTitle(e.target.value)}
         placeholder="e.g., Opening Song"
         required
-        autoFocus
+        autoFocus={!window.matchMedia('(pointer: coarse)').matches}
       />
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <DropdownSelect
@@ -85,6 +88,7 @@ export function CueItemForm({
           options={typeOptions}
         />
       </div>
+      {isSelectedTrackLocked && <p className="text-xs text-gray-500">Locked tracks cannot receive or modify cues.</p>}
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <CounterInput
@@ -115,7 +119,7 @@ export function CueItemForm({
           <Button type="button" variant="danger-secondary" className="w-full" onClick={onDelete}>
             Delete Cue
           </Button>
-          <Button type="submit" className="w-full" disabled={!title.trim()}>
+          <Button type="submit" className="w-full" disabled={!title.trim() || isSelectedTrackLocked}>
             Save Cue
           </Button>
         </div>
@@ -124,7 +128,7 @@ export function CueItemForm({
           <Button type="button" variant="secondary" className="w-full" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" className="w-full" disabled={!title.trim()}>
+          <Button type="submit" className="w-full" disabled={!title.trim() || isSelectedTrackLocked}>
             Add Cue
           </Button>
         </div>

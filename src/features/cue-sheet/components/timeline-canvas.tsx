@@ -4,8 +4,14 @@ import { ScrollArea } from '../../../components/scroll-area'
 import { useTimeline } from '../context/timeline-context'
 import { getCueTypeIcon } from '../cue-type-icons'
 import type { CueItem } from '../types'
-import { TRACK_HEIGHT, TIME_RULER_HEIGHT } from '../utils/timeline-constants'
+import { isTrackLocked } from '../utils'
+import { TRACK_HEIGHT, TIME_RULER_HEIGHT, TIMELINE_HORIZONTAL_PADDING } from '../utils/timeline-constants'
 import { formatTimeDisplay, getMarkerInterval, buildTimeMarkers, getCuesByTrack, getTrackColor, getCueTypeById } from '../utils/timeline-utils'
+
+const lockedTrackBackgroundStyle: React.CSSProperties = {
+  backgroundImage:
+    'repeating-linear-gradient(135deg, transparent 0px, transparent 7px, rgba(209, 213, 219, 0.6) 7px, rgba(209, 213, 219, 0.6) 14px)',
+}
 
 export function TimelineCanvas() {
   const {
@@ -21,20 +27,20 @@ export function TimelineCanvas() {
 
   const markerInterval = getMarkerInterval(effectiveZoom, totalMinutes)
   const timeMarkers = buildTimeMarkers(totalMinutes, markerInterval)
-  const timelineWidth = totalMinutes * pixelsPerMinute
-  const playheadLeft = Math.round(currentTimeMinutes * pixelsPerMinute)
+  const timelineWidth = totalMinutes * pixelsPerMinute + 2 * TIMELINE_HORIZONTAL_PADDING
+  const playheadLeft = Math.round(currentTimeMinutes * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING)
 
   const handleTimeRulerClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!timelineContainerRef.current) return
     const rect = timelineContainerRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left + timelineContainerRef.current.scrollLeft
+    const x = e.clientX - rect.left + timelineContainerRef.current.scrollLeft - TIMELINE_HORIZONTAL_PADDING
     setCurrentTimeMinutes(Math.max(0, Math.min(totalMinutes, x / pixelsPerMinute)))
   }, [timelineContainerRef, setCurrentTimeMinutes, totalMinutes, pixelsPerMinute])
 
   const handleTrackRowClick = useCallback((trackId: string, e: React.MouseEvent<HTMLDivElement>) => {
     if (!timelineContainerRef.current) return
     const rect = timelineContainerRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left + timelineContainerRef.current.scrollLeft
+    const x = e.clientX - rect.left + timelineContainerRef.current.scrollLeft - TIMELINE_HORIZONTAL_PADDING
     const startMinute = Math.floor(x / pixelsPerMinute)
     onTrackClick(trackId, startMinute)
   }, [timelineContainerRef, pixelsPerMinute, onTrackClick])
@@ -58,7 +64,7 @@ export function TimelineCanvas() {
             const labelTextAlign: React.CSSProperties['textAlign'] = isFirst ? 'left' : isLast ? 'right' : 'center'
 
             return (
-              <div key={minute} className="absolute top-0 bottom-0" style={{ left: minute * pixelsPerMinute }}>
+              <div key={minute} className="absolute top-0 bottom-0" style={{ left: minute * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING }}>
                 <div className="absolute bottom-4 w-px h-2 bg-gray-300 -translate-x-1/2" />
                 <span className="absolute bottom-1 text-[10px] text-gray-500 whitespace-nowrap px-1" style={{ transform: labelTransform, textAlign: labelTextAlign }}>
                   {formatTimeDisplay(minute)}
@@ -69,53 +75,62 @@ export function TimelineCanvas() {
         </div>
 
         {/* Track rows */}
-        {selectedEvent.tracks.map((track) => (
-          <div key={track.id} data-track-id={track.id} className="border-b border-gray-100 relative cursor-crosshair" style={{ height: TRACK_HEIGHT }} onPointerDown={(e) => { lastPointerTypeRef.current = e.pointerType }} onClick={(e) => { if (lastPointerTypeRef.current !== 'touch') handleTrackRowClick(track.id, e) }}>
-            {timeMarkers.map((minute) => (
-              <div key={minute} className="absolute top-0 bottom-0 w-px bg-gray-100" style={{ left: minute * pixelsPerMinute }} />
-            ))}
+        {selectedEvent.tracks.map((track) => {
+          const isLockedTrack = Boolean(track.locked)
+          const trackRowStyle: React.CSSProperties = isLockedTrack
+            ? { height: TRACK_HEIGHT, ...lockedTrackBackgroundStyle }
+            : { height: TRACK_HEIGHT }
 
-            {getCuesByTrack(selectedEvent.cueItems, track.id).map((cue) => {
-              const cueType = getCueTypeById(cueTypes, cue.type, fallbackCueType.icon)
-              const metaParts = [cueType.name, `${cue.durationMinutes}m`]
-              if (cue.notes) metaParts.push(cue.notes)
-              const metaText = metaParts.join(' \u2022 ')
+          return (
+            <div key={track.id} data-track-id={track.id} className={`border-b border-gray-100 relative ${isLockedTrack ? 'cursor-not-allowed' : 'cursor-crosshair'} ${track.hidden ? 'opacity-[0.35]' : ''}`} style={trackRowStyle} onPointerDown={(e) => { lastPointerTypeRef.current = e.pointerType }} onClick={(e) => { if (isLockedTrack || lastPointerTypeRef.current === 'touch') return; handleTrackRowClick(track.id, e) }}>
+              {timeMarkers.map((minute) => (
+                <div key={minute} className="absolute top-0 bottom-0 w-px bg-gray-100" style={{ left: minute * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING }} />
+              ))}
 
-              return (
-                <div
-                  key={cue.id}
-                  className="absolute top-1 bottom-1 rounded-lg p-0.5 flex flex-col shadow-sm group cursor-move select-none overflow-hidden touch-none"
-                  style={{ left: cue.startMinute * pixelsPerMinute, width: Math.max(cue.durationMinutes * pixelsPerMinute, 24), backgroundColor: getTrackColor(selectedEvent.tracks, cue.trackId) }}
-                  onClick={(e) => handleCueClick(e, cue)}
-                  onPointerDown={(e) => startCueDrag(e, cue, 'move')}
-                >
-                  <div className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-l-lg z-10 touch-none" onPointerDown={(e) => startCueDrag(e, cue, 'resize-left')} />
-                  <div className="flex items-center px-1.5 py-0.5 min-w-0 gap-1">
-                    <p className="text-[11px] leading-tight text-white/80 truncate flex-1 pointer-events-none">{metaText}</p>
-                    <button
-                      type="button"
-                      className="shrink-0 w-4 h-4 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => { e.stopPropagation(); onCueClick(cue) }}
-                      title="Edit cue"
-                    >
-                      <Icon.x_close size={10} className="w-2.5 h-2.5" />
-                    </button>
+              {getCuesByTrack(selectedEvent.cueItems, track.id).map((cue) => {
+                const cueType = getCueTypeById(cueTypes, cue.type, fallbackCueType.icon)
+                const metaParts = [cueType.name, `${cue.durationMinutes}m`]
+                if (cue.notes) metaParts.push(cue.notes)
+                const metaText = metaParts.join(' \u2022 ')
+                const isLockedCue = isTrackLocked(selectedEvent.tracks, cue.trackId)
+
+                return (
+                  <div
+                    key={cue.id}
+                    className={`absolute top-1 bottom-1 rounded-lg p-0.5 flex flex-col shadow-sm group select-none overflow-hidden touch-none ${isLockedCue ? 'cursor-not-allowed' : 'cursor-move'}`}
+                    style={{ left: cue.startMinute * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING, width: Math.max(cue.durationMinutes * pixelsPerMinute, 24), backgroundColor: getTrackColor(selectedEvent.tracks, cue.trackId) }}
+                    onClick={(e) => handleCueClick(e, cue)}
+                    onPointerDown={(e) => { if (isLockedCue) return; startCueDrag(e, cue, 'move') }}
+                  >
+                    <div className={`absolute left-0 top-0 bottom-0 w-2 rounded-l-lg z-10 touch-none ${isLockedCue ? 'cursor-not-allowed' : 'cursor-ew-resize hover:bg-black/10'}`} onPointerDown={(e) => { if (isLockedCue) return; startCueDrag(e, cue, 'resize-left') }} />
+                    <div className="flex items-center px-1.5 py-0.5 min-w-0 gap-1">
+                      <p className="text-[11px] leading-tight text-white/80 truncate flex-1 pointer-events-none">{metaText}</p>
+                      <button
+                        type="button"
+                        className="shrink-0 w-4 h-4 flex items-center justify-center rounded text-white/60 hover:text-white hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+                        onClick={(e) => { e.stopPropagation(); if (isLockedCue) return; onCueClick(cue) }}
+                        title="Edit cue"
+                        disabled={isLockedCue}
+                      >
+                        <Icon.x_close size={10} className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+                    <div className="flex-1 bg-black/20 rounded-md px-1.5 py-1.5 min-w-0 pointer-events-none flex items-center gap-1.5 overflow-hidden">
+                      <span className="text-white/90 shrink-0 drop-shadow-sm">{getCueTypeIcon(cueType.icon)}</span>
+                      <span className="text-[13px] font-semibold text-white truncate drop-shadow-sm">{cue.title}</span>
+                    </div>
+                    <div className={`absolute right-0 top-0 bottom-0 w-2 rounded-r-lg z-10 touch-none ${isLockedCue ? 'cursor-not-allowed' : 'cursor-ew-resize hover:bg-black/10'}`} onPointerDown={(e) => { if (isLockedCue) return; startCueDrag(e, cue, 'resize-right') }} />
                   </div>
-                  <div className="flex-1 bg-black/20 rounded-md px-1.5 py-1.5 min-w-0 pointer-events-none flex items-center gap-1.5 overflow-hidden">
-                    <span className="text-white/90 shrink-0 drop-shadow-sm">{getCueTypeIcon(cueType.icon)}</span>
-                    <span className="text-[13px] font-semibold text-white truncate drop-shadow-sm">{cue.title}</span>
-                  </div>
-                  <div className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-r-lg z-10 touch-none" onPointerDown={(e) => startCueDrag(e, cue, 'resize-right')} />
-                </div>
-              )
-            })}
-          </div>
-        ))}
+                )
+              })}
+            </div>
+          )
+        })}
 
         {/* Empty row for add track */}
         <div className="border-b border-gray-100 relative" style={{ height: TRACK_HEIGHT }}>
           {timeMarkers.map((minute) => (
-            <div key={minute} className="absolute top-0 bottom-0 w-px bg-gray-50" style={{ left: minute * pixelsPerMinute }} />
+            <div key={minute} className="absolute top-0 bottom-0 w-px bg-gray-50" style={{ left: minute * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING }} />
           ))}
         </div>
 

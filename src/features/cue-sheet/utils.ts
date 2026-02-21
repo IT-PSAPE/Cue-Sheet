@@ -53,12 +53,14 @@ export function createTrack(data: TrackFormData): Track {
     id: generateId(),
     name: data.name,
     color: data.color,
+    hidden: data.hidden ?? false,
+    locked: data.locked ?? false,
   }
 }
 
 export function createDefaultTracks(): Track[] {
   return [
-    { id: generateId(), name: 'Main Stage', color: DEFAULT_TRACK_COLORS[0] },
+    { id: generateId(), name: 'Main Stage', color: DEFAULT_TRACK_COLORS[0], hidden: false, locked: false },
   ]
 }
 
@@ -98,4 +100,20 @@ export function formatMinutes(minutes: number): string {
     return `${hrs}h ${mins}m`
   }
   return `${mins}m`
+}
+
+export function getTrackById(tracks: Track[], trackId: string): Track | null {
+  return tracks.find((track) => track.id === trackId) ?? null
+}
+
+export function isTrackLocked(tracks: Track[], trackId: string): boolean {
+  return Boolean(getTrackById(tracks, trackId)?.locked)
+}
+
+export function hasUnlockedTracks(tracks: Track[]): boolean {
+  return tracks.some((track) => !track.locked)
+}
+
+export function getFirstUnlockedTrack(tracks: Track[]): Track | null {
+  return tracks.find((track) => !track.locked) ?? null
 }

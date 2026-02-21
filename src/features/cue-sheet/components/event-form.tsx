@@ -35,7 +35,7 @@ export function EventForm({ initialData, onSubmit, onCancel }: EventFormProps) {
         onChange={(e) => setName(e.target.value)}
         placeholder="e.g., Sunday Morning Service"
         required
-        autoFocus
+        autoFocus={!window.matchMedia('(pointer: coarse)').matches}
       />
       <Textarea
         label="Description"

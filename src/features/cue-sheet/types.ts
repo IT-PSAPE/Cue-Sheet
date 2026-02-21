@@ -37,6 +37,8 @@ export interface Track {
   id: string
   name: string
   color: string
+  hidden?: boolean
+  locked?: boolean
 }
 
 export interface CueItem {
@@ -77,4 +79,13 @@ export interface CueItemFormData {
 export interface TrackFormData {
   name: string
   color: string
+  hidden?: boolean
+  locked?: boolean
+}
+
+export interface TimelineTopBarControls {
+  zoomPercent: number
+  minZoomPercent: number
+  maxZoomPercent: number
+  setZoomPercent: (value: number) => void
 }

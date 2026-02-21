@@ -2,12 +2,15 @@ import type { ReactNode } from 'react'
 import { Icon } from './icon'
 
 interface EmptyStateProps {
+  show?: boolean
   title: string
   description?: string
   action?: ReactNode
 }
 
-export function EmptyState({ title, description, action }: EmptyStateProps) {
+export function EmptyState({ show = true, title, description, action }: EmptyStateProps) {
+  if (!show) return null
+
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">

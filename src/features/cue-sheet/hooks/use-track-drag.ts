@@ -13,16 +13,18 @@ interface UseTrackDragOptions {
   selectedEvent: Event | null
   dispatch: React.Dispatch<CueSheetAction>
   eventId: string
+  disableTouchInteractions: boolean
 }
 
-export function useTrackDrag({ selectedEvent, dispatch, eventId }: UseTrackDragOptions) {
+export function useTrackDrag({ selectedEvent, dispatch, eventId, disableTouchInteractions }: UseTrackDragOptions) {
   const [trackDragState, setTrackDragState] = useState<TrackDragState | null>(null)
 
   const handleTrackDragStart = useCallback((trackId: string, index: number, e: React.PointerEvent) => {
+    if (disableTouchInteractions && e.pointerType === 'touch') return
     e.preventDefault()
     ;(e.target as Element).setPointerCapture(e.pointerId)
     setTrackDragState({ trackId, startIndex: index, currentIndex: index, startY: e.clientY })
-  }, [])
+  }, [disableTouchInteractions])
 
   const handleTrackDragMove = useCallback(
     (e: PointerEvent) => {
@@ -51,6 +53,11 @@ export function useTrackDrag({ selectedEvent, dispatch, eventId }: UseTrackDragO
     }
     setTrackDragState(null)
   }, [trackDragState, dispatch, eventId])
+
+  useEffect(() => {
+    if (!disableTouchInteractions) return
+    setTrackDragState(null)
+  }, [disableTouchInteractions])
 
   useEffect(() => {
     if (trackDragState) {

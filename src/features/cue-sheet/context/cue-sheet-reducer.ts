@@ -93,6 +93,7 @@ export function cueSheetReducer(state: CueSheetState, action: CueSheetAction): C
         ...state,
         events: state.events.map((event) => {
           if (event.id !== action.payload.eventId) return event
+          if (event.tracks.length <= 1) return event
           return {
             ...event,
             tracks: event.tracks.filter((track) => track.id !== action.payload.trackId),

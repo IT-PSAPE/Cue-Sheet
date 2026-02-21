@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { PLAYBACK_TICK_MS, PLAYBACK_SPEED_MULTIPLIER, PLAYHEAD_FOLLOW_THRESHOLD_RATIO, PLAYHEAD_FOLLOW_TARGET_RATIO, FOLLOW_SCROLL_MIN_DELTA_PX } from '../utils/timeline-constants'
+import { PLAYBACK_TICK_MS, PLAYBACK_SPEED_MULTIPLIER, PLAYHEAD_FOLLOW_THRESHOLD_RATIO, TIMELINE_HORIZONTAL_PADDING } from '../utils/timeline-constants'
 
 interface UseTimelinePlaybackOptions {
   totalMinutes: number
@@ -35,7 +35,9 @@ export function useTimelinePlayback({ totalMinutes, pixelsPerMinute, timelineCon
     return () => clearInterval(interval)
   }, [isPlaying, totalMinutes])
 
-  // Auto-follow playhead during playback
+  // Auto-follow playhead during playback: once the playhead reaches the
+  // threshold, pin it there and scroll the timeline incrementally so
+  // each tick's scroll delta matches the playhead's pixel movement.
   useEffect(() => {
     const container = timelineContainerRef.current
     if (!container || !isPlaying || isDraggingPlayheadRef.current) return
@@ -43,18 +45,14 @@ export function useTimelinePlayback({ totalMinutes, pixelsPerMinute, timelineCon
     const maxScrollLeft = Math.max(0, container.scrollWidth - container.clientWidth)
     if (maxScrollLeft <= 0) return
 
-    const playheadTimelineX = currentTimeMinutes * pixelsPerMinute
+    const playheadTimelineX = currentTimeMinutes * pixelsPerMinute + TIMELINE_HORIZONTAL_PADDING
     const playheadViewportX = playheadTimelineX - container.scrollLeft
     const thresholdX = container.clientWidth * PLAYHEAD_FOLLOW_THRESHOLD_RATIO
 
     if (playheadViewportX < thresholdX) return
 
-    const targetViewportX = container.clientWidth * PLAYHEAD_FOLLOW_TARGET_RATIO
-    const targetScrollLeft = Math.min(maxScrollLeft, Math.max(0, playheadTimelineX - targetViewportX))
-
-    if (Math.abs(targetScrollLeft - container.scrollLeft) >= FOLLOW_SCROLL_MIN_DELTA_PX) {
-      container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' })
-    }
+    const targetScrollLeft = Math.min(maxScrollLeft, Math.max(0, playheadTimelineX - thresholdX))
+    container.scrollLeft = targetScrollLeft
   }, [currentTimeMinutes, pixelsPerMinute, isPlaying, isDraggingPlayheadRef, timelineContainerRef])
 
   const handlePlayPause = useCallback(() => {
