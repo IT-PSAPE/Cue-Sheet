@@ -14,7 +14,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export function Select({ label, error, id, options, className = '', ...props }: SelectProps) {
   const selectId = id ?? label?.toLowerCase().replace(/\s+/g, '-')
-  const selectClassName = cn('px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 bg-white', error && 'border-red-500', className)
+  const selectClassName = cn('px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-foreground-brand-primary/40 focus:border-foreground-brand-primary/40 bg-white', error && 'border-red-500', className)
 
   return (
     <div className="flex flex-col gap-1">

@@ -1,5 +1,7 @@
 import { useCallback, useMemo, type ChangeEventHandler } from 'react'
 import { Icon } from './icon'
+import { IconButton } from './icon-button'
+import { cn } from '../util/cn'
 
 interface CounterInputProps {
   id: string
@@ -7,6 +9,9 @@ interface CounterInputProps {
   value: number
   min: number
   max?: number
+  step?: number
+  format?: 'number' | 'percent'
+  className?: string
   onChange: (value: number) => void
 }
 
@@ -18,16 +23,21 @@ function clamp(value: number, min: number, max?: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
-export function CounterInput({ id, label, value, min, max, onChange }: CounterInputProps) {
+export function CounterInput({ id, label, value, min, max, step = 1, format = 'number', className = '', onChange }: CounterInputProps) {
   const sanitizedValue = useMemo(() => clamp(value, min, max), [value, min, max])
+  const canDecrease = sanitizedValue > min
+  const canIncrease = max === undefined || sanitizedValue < max
+  const displayValue = format === 'percent' ? `${sanitizedValue}%` : String(sanitizedValue)
 
   const handleDecrease = useCallback(() => {
-    onChange(clamp(sanitizedValue - 1, min, max))
-  }, [max, min, onChange, sanitizedValue])
+    if (!canDecrease) return
+    onChange(clamp(sanitizedValue - step, min, max))
+  }, [canDecrease, max, min, onChange, sanitizedValue, step])
 
   const handleIncrease = useCallback(() => {
-    onChange(clamp(sanitizedValue + 1, min, max))
-  }, [max, min, onChange, sanitizedValue])
+    if (!canIncrease) return
+    onChange(clamp(sanitizedValue + step, min, max))
+  }, [canIncrease, max, min, onChange, sanitizedValue, step])
 
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
@@ -39,39 +49,32 @@ export function CounterInput({ id, label, value, min, max, onChange }: CounterIn
   )
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <div className="flex h-10 items-center overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-500">
-        <button
-          type="button"
-          onClick={handleDecrease}
-          className="grid h-full w-10 shrink-0 place-items-center text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800"
-          aria-label={`Decrease ${label}`}
-        >
-          <Icon.minus size={16} className="h-4 w-4" />
-        </button>
-        <div className="h-6 w-px shrink-0 bg-gray-200" />
-        <input
-          id={id}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          value={sanitizedValue}
-          onChange={handleInputChange}
-          className="h-full min-w-0 flex-1 bg-transparent px-2 text-center text-base font-medium text-gray-700 outline-none"
-        />
-        <div className="h-6 w-px shrink-0 bg-gray-200" />
-        <button
-          type="button"
-          onClick={handleIncrease}
-          className="grid h-full w-10 shrink-0 place-items-center text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800"
-          aria-label={`Increase ${label}`}
-        >
-          <Icon.plus size={16} className="h-4 w-4" />
-        </button>
-      </div>
+    <div className={cn('flex h-8 items-center gap-0.5 rounded-lg border border-[#e8e8e8] bg-white p-px focus-within:border-pink-500 focus-within:ring-2 focus-within:ring-pink-500', className)}>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        onClick={handleDecrease}
+        disabled={!canDecrease}
+        aria-label={`Decrease ${label}`}
+        icon={<Icon.minus size={16} className="h-4 w-4" />}
+      />
+      <input
+        id={id}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={displayValue}
+        onChange={handleInputChange}
+        className="h-full min-w-0 flex-1 bg-transparent px-1.5 text-center text-[11px] font-medium leading-[16.5px] text-[#4a5565] outline-none"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        onClick={handleIncrease}
+        disabled={!canIncrease}
+        aria-label={`Increase ${label}`}
+        icon={<Icon.plus size={16} className="h-4 w-4" />}
+      />
     </div>
   )
 }

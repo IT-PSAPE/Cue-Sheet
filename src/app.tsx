@@ -1,10 +1,13 @@
-import { CueSheetProvider } from './features/cue-sheet/context/cue-sheet-context'
-import { CueSheetScreen } from './screens/cue-sheet-screen'
+import { AppProvider } from '@/contexts/app-context'
+import { CueSheetProvider } from '@/contexts/cue-sheet/cue-sheet-context'
+import { AppScreen } from '@/screens/app-screen'
 
 export function App() {
   return (
     <CueSheetProvider>
-      <CueSheetScreen />
+      <AppProvider>
+        <AppScreen />
+      </AppProvider>
     </CueSheetProvider>
   )
 }

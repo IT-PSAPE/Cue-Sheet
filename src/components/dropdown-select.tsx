@@ -8,6 +8,7 @@ interface DropdownOption {
   value: string
   label: string
   icon?: ReactNode
+  disabled?: boolean
 }
 
 interface DropdownSelectProps {
@@ -38,17 +39,19 @@ export function DropdownSelect({ label, value, options, onChange, disabled = fal
   const renderOption = useCallback(
     function renderOption(option: DropdownOption) {
       const isSelected = option.value === value
+      const isDisabled = option.disabled === true
       const optionClassName = cn(
         'flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors',
-        isSelected ? 'bg-pink-50 text-pink-700' : 'text-gray-700 hover:bg-gray-50'
+        isDisabled ? 'cursor-not-allowed text-gray-400' : isSelected ? 'bg-pink-50 text-pink-700' : 'text-gray-700 hover:bg-gray-50'
       )
 
       const handleClick = () => {
+        if (isDisabled) return
         handleSelectOption(option.value)
       }
 
       return (
-        <button key={option.value} type="button" onClick={handleClick} className={optionClassName}>
+        <button key={option.value} type="button" onClick={handleClick} className={optionClassName} disabled={isDisabled}>
           {option.icon && <span className="text-gray-500">{option.icon}</span>}
           <span className="truncate">{option.label}</span>
         </button>
@@ -64,7 +67,7 @@ export function DropdownSelect({ label, value, options, onChange, disabled = fal
         <PopoverTrigger
           type="button"
           disabled={disabled}
-          className="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-foreground-brand-primary/40 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span className="flex min-w-0 items-center gap-2">
             {selectedOption?.icon && <span className="text-gray-500">{selectedOption.icon}</span>}

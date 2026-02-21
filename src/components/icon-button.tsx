@@ -3,15 +3,16 @@ import { cv } from '../util/cv'
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg'
-  variant?: 'neutral' | 'danger'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'neutral' | 'danger'
   isActive?: boolean
-  children: ReactNode
+  icon?: ReactNode
+  children?: ReactNode
 }
 
 const iconButtonStyles = cv({
   base: [
     'inline-flex items-center justify-center rounded-md',
-    'focus:outline-none focus:ring-2 focus:ring-pink-500',
+    'focus:outline-none focus:ring-2 focus:ring-foreground-brand-primary/40',
     'transition-colors disabled:cursor-not-allowed disabled:opacity-40',
   ],
   variants: {
@@ -21,6 +22,9 @@ const iconButtonStyles = cv({
       lg: ['h-9 w-9'],
     },
     variant: {
+      primary: ['border border-[#dc5b1c] bg-[#dc5b1c] text-white hover:bg-[#c9531a] hover:border-[#c9531a]'],
+      secondary: ['border border-[#e8e8e8] bg-white text-[#1d2939] hover:bg-gray-50'],
+      ghost: ['bg-transparent text-[#667085] hover:bg-gray-100 hover:text-[#344054]'],
       neutral: ['text-gray-400 hover:bg-gray-100 hover:text-gray-700'],
       danger: ['text-gray-400 hover:bg-red-50 hover:text-red-600'],
     },
@@ -36,11 +40,13 @@ const iconButtonStyles = cv({
   },
 })
 
-export function IconButton({ size = 'md', variant = 'neutral', isActive = false, className = '', children, type = 'button', ...props }: IconButtonProps) {
+export function IconButton({ size = 'md', variant = 'neutral', isActive = false, className = '', icon, children, type = 'button', ...props }: IconButtonProps) {
   const state = isActive ? 'active' : 'default'
+  const content = icon ?? children
+
   return (
     <button type={type} className={iconButtonStyles({ size, variant, state, className })} {...props}>
-      {children}
+      {content}
     </button>
   )
 }
