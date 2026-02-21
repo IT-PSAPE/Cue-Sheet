@@ -1,6 +1,7 @@
 import { TimelineSidebar } from './timeline-sidebar'
 import { TimelineCanvas } from './timeline-canvas'
 import { useAppContext } from '@/contexts/app-context'
+import { TimelinePreview } from './timeline-preview'
 
 export function TimelineShell() {
   const { selectedEvent } = useAppContext()
@@ -15,6 +16,7 @@ export function TimelineShell() {
         <TimelineSidebar />
         <TimelineCanvas />
       </div>
+      <TimelinePreview />
     </div>
   )
 }

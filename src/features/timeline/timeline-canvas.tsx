@@ -53,7 +53,7 @@ export function TimelineCanvas() {
   }, [justDraggedRef, onCueClick])
 
   return (
-    <ScrollArea className="min-h-0 flex-1 overflow-auto touch-auto overscroll-contain" containerRef={onTimelineContainerRef} onScroll={handleTimelineScroll}>
+    <ScrollArea className="min-h-0 relative flex-1 overflow-auto touch-auto overscroll-contain" containerRef={onTimelineContainerRef} onScroll={handleTimelineScroll}>
       <div style={{ width: timelineWidth, minWidth: '100%' }} ref={trackRowsRef} className="relative min-h-full">
         {/* Time ruler */}
         <div className="sticky top-0 z-10 border-b border-gray-200 relative bg-gray-50 select-none" style={{ height: TIME_RULER_HEIGHT }} onClick={handleTimeRulerClick}>
